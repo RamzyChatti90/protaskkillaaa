@@ -130,6 +130,9 @@ public class TaskResource {
                 if (task.getCreatedAt() != null) {
                     existingTask.setCreatedAt(task.getCreatedAt());
                 }
+                if (task.getStatus() != null) {
+                    existingTask.setStatus(task.getStatus());
+                }
 
                 return existingTask;
             })
