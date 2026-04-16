@@ -1,0 +1,20 @@
+{
+  "generator-jhipster": {
+    "applicationType": "monolith",
+    "authenticationType": "jwt",
+    "baseName": "protaskkillaaa",
+    "buildTool": "maven",
+    "clientFramework": "angular",
+    "databaseType": "sql",
+    "devDatabaseType": "h2Disk",
+    "entities": ["Task", "Category", "Comment"],
+    "jhipsterVersion": "8.11.0",
+    "jwtSecretKey": "MjUyMzI4MTdkZDE0OTQ4NjJhODRlMWQzODQ1MDA4MjI5YjZmMGM1NzJmNDZlZTNlOWVhZWNhNDI4MmJjMmJiMzczZGI3ODk4MTBlMmQyNDhlOTI3M2MzOGUyOWM2MGQ4ZmJlYjliMGQwMDU0MzBkNmFiZDliOWM1ZWE0NWJjMWM=",
+    "languages": ["en"],
+    "lastLiquibaseTimestamp": 1776381113000,
+    "nativeLanguage": "en",
+    "packageName": "com.protaskkillaaa",
+    "prodDatabaseType": "postgresql",
+    "serverPort": "9000"
+  }
+}
