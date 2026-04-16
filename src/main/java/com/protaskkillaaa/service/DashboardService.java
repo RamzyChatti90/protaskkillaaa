@@ -8,6 +8,7 @@ import com.protaskkillaaa.service.dto.DashboardDataDTO;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.ZoneOffset; // Import ajouté
 import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.List;
@@ -50,8 +51,10 @@ public class DashboardService {
             .iterate(LocalDate.now().minusDays(6), date -> date.plusDays(1))
             .limit(7)
             .map(date -> {
-                Instant startOfDay = date.atStartOfDay(ZoneId.systemDefault()).toInstant();
-                Instant endOfDay = date.plusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant();
+                // Correction: Utiliser ZoneOffset.UTC pour s'assurer que les bornes de temps sont cohérentes avec le stockage UTC des Instant.
+                // Cela corrige le décalage potentiel dû au fuseau horaire système local.
+                Instant startOfDay = date.atStartOfDay(ZoneOffset.UTC).toInstant();
+                Instant endOfDay = date.plusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant();
                 Long completedTasks = taskRepository.countByStatusAndCreatedAtBetweenAndAssignedTo_Login(
                     TaskStatus.DONE,
                     startOfDay,
