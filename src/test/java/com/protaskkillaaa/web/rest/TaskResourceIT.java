@@ -10,7 +10,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.protaskkillaaa.IntegrationTest;
 import com.protaskkillaaa.domain.Task;
+import com.protaskkillaaa.domain.enumeration.TaskStatus;
 import com.protaskkillaaa.repository.TaskRepository;
+import com.protaskkillaaa.repository.UserRepository;
 import jakarta.persistence.EntityManager;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -43,6 +45,9 @@ class TaskResourceIT {
     private static final Instant DEFAULT_CREATED_AT = Instant.ofEpochMilli(0L);
     private static final Instant UPDATED_CREATED_AT = Instant.now().truncatedTo(ChronoUnit.MILLIS);
 
+    private static final TaskStatus DEFAULT_STATUS = TaskStatus.TODO;
+    private static final TaskStatus UPDATED_STATUS = TaskStatus.IN_PROGRESS;
+
     private static final String ENTITY_API_URL = "/api/tasks";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
 
@@ -54,6 +59,9 @@ class TaskResourceIT {
 
     @Autowired
     private TaskRepository taskRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Autowired
     private EntityManager em;
@@ -72,7 +80,7 @@ class TaskResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static Task createEntity() {
-        return new Task().name(DEFAULT_NAME).description(DEFAULT_DESCRIPTION).createdAt(DEFAULT_CREATED_AT);
+        return new Task().name(DEFAULT_NAME).description(DEFAULT_DESCRIPTION).createdAt(DEFAULT_CREATED_AT).status(DEFAULT_STATUS);
     }
 
     /**
@@ -82,7 +90,7 @@ class TaskResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static Task createUpdatedEntity() {
-        return new Task().name(UPDATED_NAME).description(UPDATED_DESCRIPTION).createdAt(UPDATED_CREATED_AT);
+        return new Task().name(UPDATED_NAME).description(UPDATED_DESCRIPTION).createdAt(UPDATED_CREATED_AT).status(UPDATED_STATUS);
     }
 
     @BeforeEach
@@ -167,7 +175,8 @@ class TaskResourceIT {
             .andExpect(jsonPath("$.[*].id").value(hasItem(task.getId().intValue())))
             .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)))
             .andExpect(jsonPath("$.[*].description").value(hasItem(DEFAULT_DESCRIPTION)))
-            .andExpect(jsonPath("$.[*].createdAt").value(hasItem(DEFAULT_CREATED_AT.toString())));
+            .andExpect(jsonPath("$.[*].createdAt").value(hasItem(DEFAULT_CREATED_AT.toString())))
+            .andExpect(jsonPath("$.[*].status").value(hasItem(DEFAULT_STATUS.toString())));
     }
 
     @Test
@@ -184,7 +193,8 @@ class TaskResourceIT {
             .andExpect(jsonPath("$.id").value(task.getId().intValue()))
             .andExpect(jsonPath("$.name").value(DEFAULT_NAME))
             .andExpect(jsonPath("$.description").value(DEFAULT_DESCRIPTION))
-            .andExpect(jsonPath("$.createdAt").value(DEFAULT_CREATED_AT.toString()));
+            .andExpect(jsonPath("$.createdAt").value(DEFAULT_CREATED_AT.toString()))
+            .andExpect(jsonPath("$.status").value(DEFAULT_STATUS.toString()));
     }
 
     @Test
@@ -206,7 +216,7 @@ class TaskResourceIT {
         Task updatedTask = taskRepository.findById(task.getId()).orElseThrow();
         // Disconnect from session so that the updates on updatedTask are not directly saved in db
         em.detach(updatedTask);
-        updatedTask.name(UPDATED_NAME).description(UPDATED_DESCRIPTION).createdAt(UPDATED_CREATED_AT);
+        updatedTask.name(UPDATED_NAME).description(UPDATED_DESCRIPTION).createdAt(UPDATED_CREATED_AT).status(UPDATED_STATUS);
 
         restTaskMockMvc
             .perform(
@@ -310,7 +320,7 @@ class TaskResourceIT {
         Task partialUpdatedTask = new Task();
         partialUpdatedTask.setId(task.getId());
 
-        partialUpdatedTask.name(UPDATED_NAME).description(UPDATED_DESCRIPTION).createdAt(UPDATED_CREATED_AT);
+        partialUpdatedTask.name(UPDATED_NAME).description(UPDATED_DESCRIPTION).createdAt(UPDATED_CREATED_AT).status(UPDATED_STATUS);
 
         restTaskMockMvc
             .perform(
