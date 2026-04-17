@@ -2,9 +2,9 @@ import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { DashboardComponent } from 'app/dashboard/dashboard.component';
 
 import SharedModule from 'app/shared/shared.module';
+import DashboardComponent from './dashboard/dashboard.component';
 import { AccountService } from 'app/core/auth/account.service';
 import { Account } from 'app/core/auth/account.model';
 
