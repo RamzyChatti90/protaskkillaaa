@@ -15,5 +15,14 @@
     },
     "like": "If you like JHipster, don't forget to give us a star on",
     "github": "GitHub"
+    "github": "GitHub",
+    "dashboard": {
+      "title": "Task Dashboard",
+      "totalTasks": "Total Tasks",
+      "completedTasks": "Completed Tasks",
+      "inProgressTasks": "In Progress Tasks",
+      "dailyCompletionChart": "Daily Task Completion",
+      "taskStatusChart": "Task Status Distribution"
+    }
   }
 }
