@@ -1,0 +1,59 @@
+<div class="row">
+  <div class="col-md-12">
+    <h2 class="dashboard-title" jhiTranslate="home.dashboard.title">Dashboard de Suivi des Tâches</h2>
+
+    <div *ngIf="dashboardData()">
+      <div class="row stats-row">
+        <div class="col-md-4">
+          <div class="card stat-card total-tasks">
+            <div class="card-body">
+              <h5 class="card-title" jhiTranslate="home.dashboard.totalTasks">Total des Tâches</h5>
+              <p class="card-text">{{ dashboardData()!.totalTasks }}</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card stat-card completed-tasks">
+            <div class="card-body">
+              <h5 class="card-title" jhiTranslate="home.dashboard.completedTasks">Tâches Terminées</h5>
+              <p class="card-text">{{ dashboardData()!.completedTasks }}</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card stat-card in-progress-tasks">
+            <div class="card-body">
+              <h5 class="card-title" jhiTranslate="home.dashboard.inProgressTasks">Tâches En Cours</h5>
+              <p class="card-text">{{ dashboardData()!.inProgressTasks }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row chart-row">
+        <div class="col-md-6">
+          <div class="card chart-card">
+            <div class="card-header" jhiTranslate="home.dashboard.dailyCompletionChartTitle">
+              Évolution des tâches terminées (7 derniers jours)
+            </div>
+            <div class="card-body">
+              <canvas #dailyCompletionCanvas></canvas>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card chart-card">
+            <div class="card-header" jhiTranslate="home.dashboard.taskStatusChartTitle">Répartition des tâches par statut</div>
+            <div class="card-body">
+              <canvas #taskStatusCanvas></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="!dashboardData()" class="alert alert-warning" jhiTranslate="home.dashboard.noData">
+      Aucune donnée de tableau de bord disponible.
+    </div>
+  </div>
+</div>
