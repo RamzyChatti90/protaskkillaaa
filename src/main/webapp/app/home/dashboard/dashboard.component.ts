@@ -1,4 +1,3 @@
-
 import { Component, OnInit, OnDestroy, inject, signal, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
@@ -19,7 +18,7 @@ Chart.register(...registerables);
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
 })
-export default class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
+export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   dashboardData = signal<DashboardData | null>(null);
 
   @ViewChild('dailyCompletionCanvas') dailyCompletionCanvas!: ElementRef<HTMLCanvasElement>;
