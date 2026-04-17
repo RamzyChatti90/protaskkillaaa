@@ -1,26 +1,14 @@
+<!-- Existing content of home.component.html -->
 <div class="row">
   <div class="col-md-3">
-    <!-- Ensure JHipster logo is displayed correctly and version is visible -->
-    <img src="content/images/logo-jhipster.png" alt="JHipster Logo" class="img-fluid rounded" />
-    <span class="badge bg-warning">v{{ version }}</span>
+    <span class="hipster img-fluid rounded"></span>
   </div>
-
   <div class="col-md-9">
-    <h1 class="display-4"><span jhiTranslate="home.title">Welcome, Java Hipster!</span> (Protaskkillaaa)</h1>
+    <h1 class="display-4">Bienvenue, ProTaskKillaaa !</h1>
+    <p class="lead">Ceci est votre tableau de bord personnel pour la gestion des tâches.</p>
+    <!-- ... existing content ... -->
 
-    <p class="lead" jhiTranslate="home.subtitle">This is your homepage</p>
-
-    <div>
-      @if (account() !== null) {
-        <div class="alert alert-success">
-          @if (account(); as accountRef) {
-            <span id="home-logged-message" jhiTranslate="home.logged.message" [translateValues]="{ username: accountRef.login }"
-              >You are logged in as user &quot;{{ accountRef.login }}&quot;.</span
-            >
-          }
-        </div>
-        <!-- Le composant jhi-dashboard est déplacé ici pour être plus visible et intégré au contenu de l'utilisateur connecté -->
-        <app-dashboard></app-dashboard>
-      } @else {
-        <div class="alert alert-warning">
-          <span jhiTranslate="global.
+    <!-- Add the dashboard component here -->
+    <jhi-task-dashboard></jhi-task-dashboard>
+  </div>
+</div>
