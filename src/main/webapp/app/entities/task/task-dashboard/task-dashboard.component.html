@@ -1,0 +1,31 @@
+<div class="task-dashboard-container">
+  <h2 id="page-heading" data-cy="TaskDashboardHeading">Tableau de bord des tâches</h2>
+
+  <div class="dashboard-stats" *ngIf="dashboardStats">
+    <div class="stat-card">
+      <h3>Total des tâches</h3>
+      <p>{{ dashboardStats.total }}</p>
+    </div>
+    <div class="stat-card completed">
+      <h3>Tâches terminées</h3>
+      <p>{{ dashboardStats.completed }}</p>
+    </div>
+    <div class="stat-card ongoing">
+      <h3>Tâches en cours</h3>
+      <p>{{ dashboardStats.ongoing }}</p>
+    </div>
+    <div class="stat-card todo">
+      <h3>Tâches à faire</h3>
+      <p>{{ dashboardStats.todo }}</p>
+    </div>
+  </div>
+
+  <div class="dashboard-charts">
+    <div class="chart-card">
+      <canvas #evolutionChartCanvas></canvas>
+    </div>
+    <div class="chart-card">
+      <canvas #statusChartCanvas></canvas>
+    </div>
+  </div>
+</div>

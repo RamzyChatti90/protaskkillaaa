@@ -1,0 +1,54 @@
+<div class="dashboard-container">
+  <h2 class="dashboard-title" jhiTranslate="home.dashboard.title">Tableau de bord des tâches</h2>
+
+  <div *ngIf="isLoading()" class="alert alert-info" jhiTranslate="home.dashboard.loading">Loading data...</div>
+  <div *ngIf="errorMessage()" class="alert alert-danger">{{ errorMessage() }}</div>
+
+  <div *ngIf="dashboardData()" class="dashboard-content">
+    <div class="stats-cards row">
+      <div class="col-md-4">
+        <div class="card stats-card total-tasks">
+          <div class="card-body">
+            <h5 class="card-title" jhiTranslate="home.dashboard.totalTasks">Total des tâches</h5>
+            <p class="card-text">{{ dashboardData()!.totalTasks }}</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card stats-card completed-tasks">
+          <div class="card-body">
+            <h5 class="card-title" jhiTranslate="home.dashboard.completedTasks">Tâches terminées</h5>
+            <p class="card-text">{{ dashboardData()!.completedTasks }}</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card stats-card in-progress-tasks">
+          <div class="card-body">
+            <h5 class="card-title" jhiTranslate="home.dashboard.inProgressTasks">Tâches en cours</h5>
+            <p class="card-text">{{ dashboardData()!.inProgressTasks }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="charts-section row">
+      <div class="col-md-6">
+        <div class="card chart-card">
+          <div class="card-body">
+            <h5 class="card-title" jhiTranslate="home.dashboard.dailyCompletionChart">Évolution des tâches terminées (7 derniers jours)</h5>
+            <div class="chart-container"><canvas id="dailyCompletionChart"></canvas></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card chart-card">
+          <div class="card-body">
+            <h5 class="card-title" jhiTranslate="home.dashboard.taskStatusChart">Répartition des tâches par statut</h5>
+            <div class="chart-container"><canvas id="tasksByStatusChart"></canvas></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

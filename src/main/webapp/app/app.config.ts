@@ -50,11 +50,14 @@ export const appConfig: ApplicationConfig = {
     // Set this to true to enable service worker (PWA)
     importProvidersFrom(ServiceWorkerModule.register('ngsw-worker.js', { enabled: false })),
     importProvidersFrom(TranslationModule),
-    provideHttpClient(withInterceptorsFromDi()),
     Title,
     { provide: LOCALE_ID, useValue: 'en' },
     { provide: NgbDateAdapter, useClass: NgbDateDayjsAdapter },
-    httpInterceptorProviders,
+    // Ensure httpInterceptorProviders are declared before provideHttpClient(withInterceptorsFromDi())
+    // to guarantee they are available for discovery by the HTTP client setup.
+    // The httpInterceptorProviders array needs to be spread to provide each interceptor individually.
+    ...httpInterceptorProviders,
+    provideHttpClient(withInterceptorsFromDi()),
     { provide: TitleStrategy, useClass: AppPageTitleStrategy },
     // jhipster-needle-angular-add-module JHipster will add new module here
   ],

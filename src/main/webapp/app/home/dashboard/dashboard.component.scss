@@ -1,0 +1,67 @@
+.dashboard-container {
+  padding: 20px;
+
+  .dashboard-title {
+    margin-bottom: 30px;
+    color: #333;
+    text-align: center;
+  }
+
+  .stats-cards {
+    margin-bottom: 30px;
+
+    .stats-card {
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      padding: 15px;
+      margin-bottom: 20px;
+
+      .card-title {
+        font-size: 1.1rem;
+        color: #555;
+      }
+
+      .card-text {
+        font-size: 2.2rem;
+        font-weight: bold;
+        margin-top: 10px;
+      }
+
+      &.total-tasks {
+        background-color: #e3f2fd;
+        color: #1565c0;
+      }
+      &.completed-tasks {
+        background-color: #e8f5e9;
+        color: #2e7d32;
+      }
+      &.in-progress-tasks {
+        background-color: #fffde7;
+        color: #fbc02d;
+      }
+    }
+  }
+
+  .charts-section {
+    .chart-card {
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      margin-bottom: 20px;
+
+      .card-title {
+        font-size: 1.1rem;
+        color: #555;
+        margin-bottom: 15px;
+        text-align: center;
+      }
+
+      .chart-container {
+        position: relative;
+        height: 300px; /* Hauteur fixe pour les graphiques */
+        width: 100%;
+      }
+    }
+  }
+}

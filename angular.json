@@ -22,6 +22,12 @@
           "options": {
             "customWebpackConfig": {
               "path": "./webpack/webpack.custom.js"
+            "path": "./webpack/webpack.custom.js"
+            },
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "node_modules/bootstrap/scss"
+              ]
             },
             "outputPath": "target/classes/static/",
             "index": "src/main/webapp/index.html",

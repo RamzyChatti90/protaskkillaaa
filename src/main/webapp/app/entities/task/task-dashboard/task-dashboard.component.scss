@@ -1,0 +1,100 @@
+/* src/main/webapp/app/entities/task/task-dashboard/task-dashboard.component.scss */
+
+.task-dashboard-container {
+  padding: 20px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  h2 {
+    color: #343a40;
+    margin-bottom: 25px;
+    text-align: center;
+  }
+
+  .dashboard-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    margin-bottom: 40px;
+
+    .stat-card {
+      background-color: #ffffff;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 20px 30px;
+      text-align: center;
+      flex: 1 1 calc(25% - 20px); /* Adjust based on desired number of cards per row */
+      min-width: 180px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+      transition: transform 0.2s ease-in-out;
+
+      &:hover {
+        transform: translateY(-3px);
+      }
+
+      h3 {
+        color: #6c757d;
+        font-size: 1rem;
+        margin-bottom: 10px;
+        text-transform: uppercase;
+      }
+
+      p {
+        font-size: 2.2rem;
+        font-weight: bold;
+        color: #007bff; /* Default color for total */
+        margin: 0;
+      }
+
+      &.completed p {
+        color: #28a745; /* Green */
+      }
+      &.ongoing p {
+        color: #ffc107; /* Yellow */
+      }
+      &.todo p {
+        color: #dc3545; /* Red */
+      }
+    }
+  }
+
+  .dashboard-charts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+
+    .chart-card {
+      background-color: #ffffff;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+      flex: 1 1 calc(50% - 20px); /* Two charts per row */
+      min-width: 300px;
+      height: 400px; /* Fixed height for charts */
+
+      canvas {
+        width: 100% !important;
+        height: 100% !important;
+      }
+    }
+  }
+
+  @media (max-width: 992px) {
+    .dashboard-stats .stat-card {
+      flex: 1 1 calc(50% - 20px); /* Two cards per row on medium screens */
+    }
+    .dashboard-charts .chart-card {
+      flex: 1 1 100%; /* One chart per row on medium screens */
+    }
+  }
+
+  @media (max-width: 576px) {
+    .dashboard-stats .stat-card {
+      flex: 1 1 100%; /* One card per row on small screens */
+    }
+  }
+}

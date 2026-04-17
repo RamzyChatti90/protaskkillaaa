@@ -2,8 +2,8 @@ import { Injectable, Signal, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
-import { Observable, ReplaySubject, of } from 'rxjs';
-import { catchError, shareReplay, tap } from 'rxjs/operators';
+import { Observable, ReplaySubject, of, throwError, timer } from 'rxjs'; // Added throwError, timer
+import { catchError, shareReplay, tap, retryWhen, concatMap } from 'rxjs/operators'; // Added retryWhen, concatMap
 
 import { StateStorageService } from 'app/core/auth/state-storage.service';
 import { Account } from 'app/core/auth/account.model';
@@ -78,7 +78,21 @@ export class AccountService {
   }
 
   private fetch(): Observable<Account> {
-    return this.http.get<Account>(this.applicationConfigService.getEndpointFor('api/account'));
+    return this.http.get<Account>(this.applicationConfigService.getEndpointFor('api/account')).pipe(
+      retryWhen(errors =>
+        errors.pipe(
+          concatMap((error, i) => {
+            const maxRetries = 2; // Number of retries after the initial failure (total 3 attempts)
+            if (error.status === 401 && i < maxRetries) {
+              console.warn(`Authentication failed (401), retrying account fetch... Attempt ${i + 1}/${maxRetries}`);
+              return timer(500); // Delay for 500ms before retrying
+            }
+            // If not 401 or max retries reached, re-throw the error
+            return throwError(() => error);
+          })
+        )
+      )
+    );
   }
 
   private navigateToStoredUrl(): void {
