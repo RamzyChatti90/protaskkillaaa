@@ -14,6 +14,7 @@ import MainComponent from './layouts/main/main.component';
 @Component({
   selector: 'jhi-app',
   template: '<jhi-main />',
+  standalone: true, // Assuming standalone component based on imports array
   imports: [
     MainComponent,
     // jhipster-needle-angular-add-module JHipster will add new module here
@@ -34,6 +35,7 @@ export default class AppComponent implements OnInit {
 
   ngOnInit(): void {
     // Force user identity loading at application startup to react to a potentially existing JWT token in localStorage
-    this.accountService.authenticate(true);
+    // The authenticate() method without arguments is used to trigger the check for an existing JWT token and load the account.
+    this.accountService.authenticate();
   }
 }
