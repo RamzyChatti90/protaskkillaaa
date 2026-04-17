@@ -6,7 +6,7 @@ import { DashboardData } from './dashboard.model';
 
 @Injectable({ providedIn: 'root' })
 export class DashboardService {
-  protected resourceUrl = this.applicationConfigService.getEndpointFor('api/tasks/dashboard');
+  protected resourceUrl = this.applicationConfigService.getEndpointFor('api/dashboard');
 
   constructor(protected http: HttpClient, protected applicationConfigService: ApplicationConfigService) {}
 
