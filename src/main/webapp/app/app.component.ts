@@ -35,7 +35,7 @@ export default class AppComponent implements OnInit {
 
   ngOnInit(): void {
     // Force user identity loading at application startup to react to a potentially existing JWT token in localStorage
-    // The authenticate() method without arguments is used to trigger the check for an existing JWT token and load the account.
-    this.accountService.authenticate();
+    // The identity() method is used to trigger the check for an existing JWT token and load the account.
+    this.accountService.identity().subscribe();
   }
 }
