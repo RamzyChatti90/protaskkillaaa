@@ -10,7 +10,7 @@ export class DashboardService {
   private readonly applicationConfigService = inject(ApplicationConfigService);
   private readonly http = inject(HttpClient);
 
-  private readonly resourceUrl = this.applicationConfigService.getEndpointFor('api/dashboard');
+  private readonly resourceUrl = this.applicationConfigService.getEndpointFor('api/v1/tasks/summary');
 
   getDashboardData(): Observable<DashboardData> {
     return this.http.get<DashboardData>(this.resourceUrl);
