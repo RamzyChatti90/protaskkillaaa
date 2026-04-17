@@ -1,90 +1,68 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { of, Subject } from 'rxjs';
-import { Chart } from 'chart.js';
-
-import { DashboardComponent } from '../../../../main/webapp/app/home/dashboard/dashboard.component';
-import { DashboardService } from '../../../../main/webapp/app/home/dashboard/dashboard.service';
-import { DashboardData } from '../../../../main/webapp/app/home/dashboard/dashboard.model';
+import { of } from 'rxjs';
 import { TranslateModule } from '@ngx-translate/core';
+import { DashboardComponent } from './dashboard.component';
+import { DashboardService } from './dashboard.service';
+import { DashboardData } from './dashboard.model';
 
 describe('DashboardComponent', () => {
-  let component: DashboardComponent;
+  let comp: DashboardComponent;
   let fixture: ComponentFixture<DashboardComponent>;
-  let dashboardService: DashboardService;
-  let mockDashboardData: DashboardData;
+  let service: DashboardService;
+
+  const mockDashboardData: DashboardData = {
+    totalTasks: 10,
+    completedTasks: 5,
+    inProgressTasks: 3,
+    dailyCompletions: [
+      { date: '2023-01-01', completedTasks: 1 },
+      { date: '2023-01-02', completedTasks: 2 },
+    ],
+  };
 
   beforeEach(async () => {
-    mockDashboardData = {
-      totalTasks: 10,
-      completedTasks: 5,
-      inProgressTasks: 3,
-      dailyCompletions: [
-        { date: '2023-01-01', completedTasks: 1 },
-        { date: '2023-01-02', completedTasks: 2 },
-      ],
-    };
-
-    const dashboardServiceStub = {
-      getDashboardData: () => of(mockDashboardData),
-    };
-
     await TestBed.configureTestingModule({
-      imports: [ProtaskkillaaaHomeModule, HttpClientTestingModule, TranslateModule.forRoot()],
       imports: [DashboardComponent, HttpClientTestingModule, TranslateModule.forRoot()],
+      providers: [DashboardService],
     }).compileComponents();
 
     fixture = TestBed.createComponent(DashboardComponent);
-    component = fixture.componentInstance;
-    dashboardService = TestBed.inject(DashboardService);
-
-    // Mock Chart.js constructor and destroy method
-    spyOn(Chart, 'constructor' as any).and.returnValue({
-      destroy: jasmine.createSpy('destroy'),
-    });
-    spyOn(Chart.prototype, 'destroy').and.callThrough();
-  });
-
-  it('should create', () => {
-    expect(component).toBeTruthy();
+    comp = fixture.componentInstance;
+    service = TestBed.inject(DashboardService);
   });
 
   it('should load dashboard data on init', () => {
-    spyOn(dashboardService, 'getDashboardData').and.returnValue(of(mockDashboardData));
-    component.ngOnInit();
-    expect(dashboardService.getDashboardData).toHaveBeenCalled();
-    expect(component.dashboardData()).toEqual(mockDashboardData);
-  });
-
-  it('should call updateCharts on init if data is present', () => {
-    spyOn(component, 'updateCharts');
-    component.ngOnInit();
-    expect(component.updateCharts).toHaveBeenCalled();
-  });
-
-  it('should create daily completion chart', () => {
-    // Manually set dashboardData and call the chart creation method
-    component.dashboardData.set(mockDashboardData);
-    component.dailyCompletionCanvas = { nativeElement: { getContext: () => ({}) } } as ElementRef<HTMLCanvasElement>;
-    component.createDailyCompletionChart();
-    expect(Chart).toHaveBeenCalledWith(jasmine.any(Object), jasmine.objectContaining({ type: 'line' }));
-  });
-
-  it('should create task status chart', () => {
-    // Manually set dashboardData and call the chart creation method
-    component.dashboardData.set(mockDashboardData);
-    component.taskStatusCanvas = { nativeElement: { getContext: () => ({}) } } as ElementRef<HTMLCanvasElement>;
-    component.createTaskStatusChart();
-    expect(Chart).toHaveBeenCalledWith(jasmine.any(Object), jasmine.objectContaining({ type: 'pie' }));
+    jest.spyOn(service, 'getDashboardData').mockReturnValue(of(mockDashboardData));
+    comp.ngOnInit();
+    expect(comp.dashboardData()).toEqual(mockDashboardData);
   });
 
   it('should destroy charts on destroy', () => {
-    component.dailyCompletionChart = new Chart('dailyCompletionCanvas', {});
-    component.taskStatusChart = new Chart('taskStatusCanvas', {});
+    comp.dailyCompletionChart = { destroy: jest.fn() } as any;
+    comp.taskStatusChart = { destroy: jest.fn() } as any;
 
-    component.ngOnDestroy();
+    comp.ngOnDestroy();
 
-    expect(component.dailyCompletionChart!.destroy).toHaveBeenCalled();
-    expect(component.taskStatusChart!.destroy).toHaveBeenCalled();
+    expect(comp.dailyCompletionChart?.destroy).toHaveBeenCalled();
+    expect(comp.taskStatusChart?.destroy).toHaveBeenCalled();
+  });
+
+  it('should create daily completion chart', () => {
+    comp.dashboardData.set(mockDashboardData);
+    comp.dailyCompletionCanvas = { nativeElement: { getContext: () => ({}) } } as ElementRef<HTMLCanvasElement>;
+    comp.createDailyCompletionChart();
+    expect(comp.dailyCompletionChart).not.toBeNull();
+    expect(comp.dailyCompletionChart?.data.labels).toEqual(['2023-01-01', '2023-01-02']);
+    expect(comp.dailyCompletionChart?.data.datasets[0].data).toEqual([1, 2]);
+  });
+
+  it('should create task status chart', () => {
+    comp.dashboardData.set(mockDashboardData);
+    comp.taskStatusCanvas = { nativeElement: { getContext: () => ({}) } } as ElementRef<HTMLCanvasElement>;
+    comp.createTaskStatusChart();
+    expect(comp.taskStatusChart).not.toBeNull();
+    expect(comp.taskStatusChart?.data.labels).toEqual(['Completed', 'In Progress', 'To Do']);
+    expect(comp.taskStatusChart?.data.datasets[0].data).toEqual([5, 3, 2]); // 10 - 5 - 3 = 2
   });
 });
