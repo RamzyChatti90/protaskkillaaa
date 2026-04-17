@@ -14,7 +14,6 @@
       "follow": "follow @jhipster on Twitter"
     },
     "like": "If you like JHipster, don't forget to give us a star on",
-    "github": "GitHub"
     "github": "GitHub",
     "dashboard": {
       "title": "Task Dashboard",
@@ -24,4 +23,5 @@
       "dailyCompletionChart": "Daily Task Completion",
       "taskStatusChart": "Task Distribution by Status"
     }
+  }
 }
