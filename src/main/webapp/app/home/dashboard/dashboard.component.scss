@@ -1,0 +1,42 @@
+/* Styles pour le DashboardComponent */
+.card {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  min-height: 150px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.card-title {
+  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.card-text {
+  font-weight: bold;
+}
+
+.bg-primary {
+  background-color: #007bff !important; /* Bootstrap primary */
+}
+
+.bg-success {
+  background-color: #28a745 !important; /* Bootstrap success */
+}
+
+.bg-warning {
+  background-color: #ffc107 !important; /* Bootstrap warning */
+}
+
+.chart-container {
+  position: relative;
+  height: 300px;
+  width: 100%;
+}
+
+/* Pour s'assurer que les graphiques Chart.js s'affichent correctement */
+canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
