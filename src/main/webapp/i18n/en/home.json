@@ -20,8 +20,19 @@
       "totalTasks": "Total Tasks",
       "completedTasks": "Completed Tasks",
       "inProgressTasks": "In Progress Tasks",
-      "dailyCompletionChart": "Daily Task Completion",
-      "taskStatusChart": "Task Distribution by Status"
+      "dailyCompletionChartTitle": "Daily Task Completion (Last 7 Days)",
+      "dailyCompletionChart": {
+        "label": "Completed Tasks"
+      },
+      "taskStatusChartTitle": "Task Distribution by Status",
+      "taskStatusChart": {
+        "completed": "Completed",
+        "inProgress": "In Progress",
+        "todo": "To Do"
+      }
+    }
+  }
+}
     }
   }
 }
