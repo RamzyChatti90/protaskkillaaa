@@ -128,6 +128,22 @@ module.exports = async (config, options, targetOptions) => {
     }),
   );
 
+  config.module.rules.forEach(rule => {
+    if (Array.isArray(rule.use)) {
+      rule.use.forEach(useEntry => {
+        if (typeof useEntry === 'object' && useEntry.loader === 'sass-loader') {
+          if (!useEntry.options.sassOptions) {
+            useEntry.options.sassOptions = {};
+          }
+          if (!useEntry.options.sassOptions.includePaths) {
+            useEntry.options.sassOptions.includePaths = [];
+          }
+          useEntry.options.sassOptions.includePaths.push('node_modules/bootstrap/scss');
+        }
+      });
+    }
+  });
+
   config = merge(
     config,
     // jhipster-needle-add-webpack-config - JHipster will add custom config
