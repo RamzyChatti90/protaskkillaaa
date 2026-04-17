@@ -1,6 +1,5 @@
 package com.protaskkillaaa.web.rest;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -11,7 +10,7 @@ import com.protaskkillaaa.service.DashboardService;
 import com.protaskkillaaa.service.dto.DailyTaskCompletionDTO;
 import com.protaskkillaaa.service.dto.DashboardDataDTO;
 import java.time.LocalDate;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,7 +31,7 @@ import org.springframework.test.web.servlet.MockMvc;
 @WithMockUser
 class DashboardResourceIT {
 
-    private static final String API_DASHBOARD_URL = "/api/dashboard";
+    private static final String DEFAULT_LOGIN = "user";
 
     @Autowired
     private MockMvc restDashboardMockMvc;
@@ -40,35 +39,43 @@ class DashboardResourceIT {
     @MockBean
     private DashboardService dashboardService;
 
-    private DashboardDataDTO mockDashboardData;
+    private DashboardDataDTO expectedDashboardData;
 
     @BeforeEach
-    void setUp() {
-        // Prepare mock data
+    void setup() {
+        // Setup mock data for DashboardService
         Long totalTasks = 10L;
+
         Map<TaskStatus, Long> tasksByStatus = new HashMap<>();
-        tasksByStatus.put(TaskStatus.TODO, 5L);
-        tasksByStatus.put(TaskStatus.IN_PROGRESS, 3L);
+        tasksByStatus.put(TaskStatus.TODO, 3L);
+        tasksByStatus.put(TaskStatus.IN_PROGRESS, 5L);
         tasksByStatus.put(TaskStatus.DONE, 2L);
+        tasksByStatus.put(TaskStatus.CANCELLED, 0L);
 
-        List<DailyTaskCompletionDTO> dailyCompletions = List.of(new DailyTaskCompletionDTO(LocalDate.now(), 1L));
+        List<DailyTaskCompletionDTO> dailyCompletions = Arrays.asList(
+            new DailyTaskCompletionDTO(LocalDate.now().minusDays(1), 1L),
+            new DailyTaskCompletionDTO(LocalDate.now(), 2L)
+        );
 
-        mockDashboardData = new DashboardDataDTO(totalTasks, tasksByStatus, dailyCompletions);
+        expectedDashboardData = new DashboardDataDTO(totalTasks, tasksByStatus, dailyCompletions);
     }
 
     @Test
-    void getDashboardData_shouldReturnDashboardData() throws Exception {
-        when(dashboardService.getDashboardData()).thenReturn(mockDashboardData);
+    void getDashboardData() throws Exception {
+        when(dashboardService.getDashboardData()).thenReturn(expectedDashboardData);
 
         restDashboardMockMvc
-            .perform(get(API_DASHBOARD_URL).accept(MediaType.APPLICATION_JSON))
+            .perform(get("/api/dashboard").accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-            .andExpect(jsonPath("$.totalTasks").value(mockDashboardData.getTotalTasks()))
-            .andExpect(jsonPath("$.tasksByStatus.TODO").value(mockDashboardData.getTasksByStatus().get(TaskStatus.TODO)))
-            .andExpect(jsonPath("$.tasksByStatus.IN_PROGRESS").value(mockDashboardData.getTasksByStatus().get(TaskStatus.IN_PROGRESS)))
-            .andExpect(jsonPath("$.tasksByStatus.DONE").value(mockDashboardData.getTasksByStatus().get(TaskStatus.DONE)))
-            .andExpect(jsonPath("$.dailyCompletions[0].date").exists())
-            .andExpect(jsonPath("$.dailyCompletions[0].completedTasks").value(1L));
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.totalTasks").value(expectedDashboardData.getTotalTasks()))
+            .andExpect(jsonPath("$.tasksByStatus.TODO").value(expectedDashboardData.getTasksByStatus().get(TaskStatus.TODO)))
+            .andExpect(jsonPath("$.tasksByStatus.IN_PROGRESS").value(expectedDashboardData.getTasksByStatus().get(TaskStatus.IN_PROGRESS)))
+            .andExpect(jsonPath("$.tasksByStatus.DONE").value(expectedDashboardData.getTasksByStatus().get(TaskStatus.DONE)))
+            .andExpect(jsonPath("$.tasksByStatus.CANCELLED").value(expectedDashboardData.getTasksByStatus().get(TaskStatus.CANCELLED)))
+            .andExpect(jsonPath("$.dailyCompletions.[0].date").value(expectedDashboardData.getDailyCompletions().get(0).getDate().toString()))
+            .andExpect(jsonPath("$.dailyCompletions.[0].completedTasks").value(expectedDashboardData.getDailyCompletions().get(0).getCompletedTasks()))
+            .andExpect(jsonPath("$.dailyCompletions.[1].date").value(expectedDashboardData.getDailyCompletions().get(1).getDate().toString()))
+            .andExpect(jsonPath("$.dailyCompletions.[1].completedTasks").value(expectedDashboardData.getDailyCompletions().get(1).getCompletedTasks()));
     }
 }
