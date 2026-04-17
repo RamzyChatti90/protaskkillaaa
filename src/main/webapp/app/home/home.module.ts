@@ -8,6 +8,6 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 
 @NgModule({
   imports: [SharedModule, RouterModule.forChild([HOME_ROUTE])],
-  declarations: [HomeComponent],
+  declarations: [HomeComponent, DashboardComponent], // Ajoutez DashboardComponent aux déclarations
 })
 export class ProtaskkillaaaHomeModule {}
