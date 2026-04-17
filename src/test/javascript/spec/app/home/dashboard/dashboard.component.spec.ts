@@ -3,9 +3,10 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { of, Subject } from 'rxjs';
 import { Chart } from 'chart.js';
 
-import DashboardComponent from './dashboard.component';
-import { DashboardService } from './dashboard.service';
-import { DashboardData } from './dashboard.model';
+import { DashboardComponent } from '../../../../main/webapp/app/home/dashboard/dashboard.component';
+import { DashboardService } from '../../../../main/webapp/app/home/dashboard/dashboard.service';
+import { DashboardData } from '../../../../main/webapp/app/home/dashboard/dashboard.model';
+import { TranslateModule } from '@ngx-translate/core';
 
 describe('DashboardComponent', () => {
   let component: DashboardComponent;
@@ -29,16 +30,9 @@ describe('DashboardComponent', () => {
     };
 
     await TestBed.configureTestingModule({
-      imports: [DashboardComponent, HttpClientTestingModule],
-      providers: [{ provide: DashboardService, useValue: dashboardServiceStub }],
-    })
-      .overrideComponent(DashboardComponent, {
-        set: {
-          imports: [], // Clear imports for isolated testing
-          providers: [],
-        },
-      })
-      .compileComponents();
+      imports: [ProtaskkillaaaHomeModule, HttpClientTestingModule, TranslateModule.forRoot()],
+      imports: [DashboardComponent, HttpClientTestingModule, TranslateModule.forRoot()],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(DashboardComponent);
     component = fixture.componentInstance;
@@ -90,7 +84,7 @@ describe('DashboardComponent', () => {
 
     component.ngOnDestroy();
 
-    expect(component.dailyCompletionChart.destroy).toHaveBeenCalled();
-    expect(component.taskStatusChart.destroy).toHaveBeenCalled();
+    expect(component.dailyCompletionChart!.destroy).toHaveBeenCalled();
+    expect(component.taskStatusChart!.destroy).toHaveBeenCalled();
   });
 });
