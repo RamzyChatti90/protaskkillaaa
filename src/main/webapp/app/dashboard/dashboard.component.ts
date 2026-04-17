@@ -1,8 +1,10 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
 import { Subject, combineLatest } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { ChartData, ChartOptions, ChartType } from 'chart.js';
+import { Chart, ChartConfiguration, ChartData, ChartOptions, ChartType, registerables } from 'chart.js';
 
+import { CommonModule } from '@angular/common';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { DashboardService } from './dashboard.service';
 import { IDashboardStats } from './dashboard.model';
 
@@ -10,10 +12,18 @@ import { IDashboardStats } from './dashboard.model';
   selector: 'jhi-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
+  standalone: true,
+  imports: [CommonModule, FontAwesomeModule],
 })
 export class DashboardComponent implements OnInit, OnDestroy {
   dashboardStats: IDashboardStats | null = null;
   isLoading = false;
+
+  @ViewChild('lineChart') lineChartRef!: ElementRef;
+  @ViewChild('pieChart') pieChartRef!: ElementRef;
+
+  lineChart: Chart | undefined;
+  pieChart: Chart | undefined;
 
   // Line Chart for Completed Tasks Evolution
   public lineChartData: ChartData<'line'> = {
@@ -81,18 +91,33 @@ export class DashboardComponent implements OnInit, OnDestroy {
       legend: {
         position: 'top',
       },
+        position: 'top',
+      },
     },
   };
   public pieChartType: ChartType = 'pie';
 
   protected destroy$ = new Subject<void>();
 
-  constructor(protected dashboardService: DashboardService) {}
-
+  constructor(protected dashboardService: DashboardService) {
+    Chart.register(...registerables);
+  }
   ngOnInit(): void {
     this.loadDashboardData();
   }
 
+  ngAfterViewInit(): void {
+    this.lineChart = new Chart(this.lineChartRef.nativeElement, {
+      type: 'line',
+      data: this.lineChartData,
+      options: this.lineChartOptions,
+    });
+
+    this.pieChart = new Chart(this.pieChartRef.nativeElement, {
+      type: 'pie',
+      data: this.pieChartData,
+      options: this.pieChartOptions,
+    });
   loadDashboardData(): void {
     this.isLoading = true;
     combineLatest([
@@ -106,17 +131,23 @@ export class DashboardComponent implements OnInit, OnDestroy {
           this.dashboardStats = stats;
 
           // Update Line Chart Data
-          this.lineChartData.labels = evolution.map(item => item.date);
-          if (this.lineChartData.datasets[0]) {
-            this.lineChartData.datasets[0].data = evolution.map(item => item.count);
+          if (this.lineChart) {
+            this.lineChart.data.labels = evolution.map(item => item.date);
+            if (this.lineChart.data.datasets[0]) {
+              (this.lineChart.data.datasets[0] as any).data = evolution.map(item => item.count);
+            }
+            this.lineChart.update();
           }
 
           // Update Pie Chart Data
           const completed = distribution.find(item => item.status === 'COMPLETED')?.count || 0;
           const inProgress = distribution.find(item => item.status === 'IN_PROGRESS')?.count || 0;
           const todo = distribution.find(item => item.status === 'TODO')?.count || 0;
-          if (this.pieChartData.datasets[0]) {
-            this.pieChartData.datasets[0].data = [completed, inProgress, todo];
+          if (this.pieChart) {
+            if (this.pieChart.data.datasets[0]) {
+              (this.pieChart.data.datasets[0] as any).data = [completed, inProgress, todo];
+            }
+            this.pieChart.update();
           }
 
           this.isLoading = false;
@@ -131,5 +162,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+    this.lineChart?.destroy();
+    this.pieChart?.destroy();
   }
-}
