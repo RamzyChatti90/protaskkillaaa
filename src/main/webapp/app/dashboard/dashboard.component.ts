@@ -135,7 +135,7 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
           if (this.lineChart) {
             this.lineChart.data.labels = evolution.map(item => item.date);
             if (this.lineChart.data.datasets[0]) {
-              (this.lineChart.data.datasets[0] as any).data = evolution.map(item => item.count);
+              this.lineChart.data.datasets[0].data = evolution.map(item => item.count);
             }
             this.lineChart.update();
           }
@@ -146,7 +146,7 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
           const todo = distribution.find(item => item.status === 'TODO')?.count || 0;
           if (this.pieChart) {
             if (this.pieChart.data.datasets[0]) {
-              (this.pieChart.data.datasets[0] as any).data = [completed, inProgress, todo];
+              this.pieChart.data.datasets[0].data = [completed, inProgress, todo];
             }
             this.pieChart.update();
           }
