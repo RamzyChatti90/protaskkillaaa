@@ -1,7 +1,10 @@
 package com.protaskkillaaa.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.when;
 
 import com.protaskkillaaa.domain.enumeration.TaskStatus;
 import com.protaskkillaaa.repository.TaskRepository;
@@ -10,8 +13,8 @@ import com.protaskkillaaa.service.dto.DailyTaskCompletionDTO;
 import com.protaskkillaaa.service.dto.DashboardDataDTO;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.HashMap;
+import java.time.ZoneOffset;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -32,82 +35,74 @@ class DashboardServiceTest {
     @InjectMocks
     private DashboardService dashboardService;
 
-    private String currentUserLogin;
+    private final String TEST_LOGIN = "testuser";
 
     @BeforeEach
     void setUp() {
-        currentUserLogin = "testuser";
+        // Mock SecurityUtils.getCurrentUserLogin() for each test
+        // This is done in individual tests or setup if it's a static method
     }
 
     @Test
     void getDashboardData_shouldReturnCorrectData() {
         try (MockedStatic<SecurityUtils> mockedSecurityUtils = mockStatic(SecurityUtils.class)) {
-            mockedSecurityUtils.when(SecurityUtils::getCurrentUserLogin).thenReturn(Optional.of(currentUserLogin));
+            mockedSecurityUtils.when(SecurityUtils::getCurrentUserLogin).thenReturn(Optional.of(TEST_LOGIN));
 
-            // Mocking total tasks
-            when(taskRepository.countByAssignedTo_Login(currentUserLogin)).thenReturn(10L);
+            // Mock total tasks
+            when(taskRepository.countByAssignedTo_Login(TEST_LOGIN)).thenReturn(10L);
 
-            // Mocking tasks by status
-            when(taskRepository.countByStatusAndAssignedTo_Login(TaskStatus.TODO, currentUserLogin)).thenReturn(5L);
-            when(taskRepository.countByStatusAndAssignedTo_Login(TaskStatus.IN_PROGRESS, currentUserLogin)).thenReturn(3L);
-            when(taskRepository.countByStatusAndAssignedTo_Login(TaskStatus.DONE, currentUserLogin)).thenReturn(2L);
+            // Mock tasks by status
+            when(taskRepository.countByStatusAndAssignedTo_Login(TaskStatus.TODO, TEST_LOGIN)).thenReturn(3L);
+            when(taskRepository.countByStatusAndAssignedTo_Login(TaskStatus.IN_PROGRESS, TEST_LOGIN)).thenReturn(5L);
+            when(taskRepository.countByStatusAndAssignedTo_Login(TaskStatus.DONE, TEST_LOGIN)).thenReturn(2L);
+            when(taskRepository.countByStatusAndAssignedTo_Login(TaskStatus.CANCELLED, TEST_LOGIN)).thenReturn(0L);
 
-            // Mocking daily task completions
+            // Mock daily completions for the last 7 days
             LocalDate today = LocalDate.now();
-            when(
-                taskRepository.countByStatusAndCreatedAtBetweenAndAssignedTo_Login(
-                    eq(TaskStatus.DONE),
-                    any(Instant.class),
-                    any(Instant.class),
-                    eq(currentUserLogin)
+            for (int i = 0; i < 7; i++) {
+                LocalDate date = today.minusDays(6 - i);
+                Instant startOfDay = date.atStartOfDay(ZoneOffset.UTC).toInstant();
+                Instant endOfDay = date.plusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant();
+                when(
+                    taskRepository.countByStatusAndCreatedAtBetweenAndAssignedTo_Login(
+                        eq(TaskStatus.DONE),
+                        eq(startOfDay),
+                        eq(endOfDay),
+                        eq(TEST_LOGIN)
+                    )
                 )
-            )
-                .thenAnswer(invocation -> {
-                    Instant start = invocation.getArgument(1);
-                    Instant end = invocation.getArgument(2);
-                    LocalDate date = LocalDate.ofInstant(start, ZoneId.systemDefault());
-                    if (date.isEqual(today.minusDays(0))) return 1L;
-                    if (date.isEqual(today.minusDays(1))) return 0L;
-                    if (date.isEqual(today.minusDays(2))) return 1L;
-                    if (date.isEqual(today.minusDays(3))) return 0L;
-                    if (date.isEqual(today.minusDays(4))) return 1L;
-                    if (date.isEqual(today.minusDays(5))) return 0L;
-                    if (date.isEqual(today.minusDays(6))) return 1L;
-                    return 0L;
-                });
+                    .thenReturn((long) i); // Simulate 0, 1, 2, 3, 4, 5, 6 completed tasks
+            }
 
             DashboardDataDTO result = dashboardService.getDashboardData();
 
-            // Assertions
             assertThat(result).isNotNull();
             assertThat(result.getTotalTasks()).isEqualTo(10L);
 
-            Map<TaskStatus, Long> expectedTasksByStatus = new HashMap<>();
-            expectedTasksByStatus.put(TaskStatus.TODO, 5L);
-            expectedTasksByStatus.put(TaskStatus.IN_PROGRESS, 3L);
-            expectedTasksByStatus.put(TaskStatus.DONE, 2L);
-            assertThat(result.getTasksByStatus()).isEqualTo(expectedTasksByStatus);
+            Map<TaskStatus, Long> tasksByStatus = result.getTasksByStatus();
+            assertThat(tasksByStatus).isNotNull().hasSize(4);
+            assertThat(tasksByStatus.get(TaskStatus.TODO)).isEqualTo(3L);
+            assertThat(tasksByStatus.get(TaskStatus.IN_PROGRESS)).isEqualTo(5L);
+            assertThat(tasksByStatus.get(TaskStatus.DONE)).isEqualTo(2L);
+            assertThat(tasksByStatus.get(TaskStatus.CANCELLED)).isEqualTo(0L);
 
-            assertThat(result.getDailyCompletions()).hasSize(7);
-            assertThat(
-                result
-                    .getDailyCompletions()
-                    .stream()
-                    .filter(dto -> dto.getDate().isEqual(today))
-                    .findFirst()
-                    .map(DailyTaskCompletionDTO::getCompletedTasks)
-                    .orElse(0L)
-            )
-                .isEqualTo(1L); // Today
+            List<DailyTaskCompletionDTO> dailyCompletions = result.getDailyCompletions();
+            assertThat(dailyCompletions).isNotNull().hasSize(7);
+            for (int i = 0; i < 7; i++) {
+                assertThat(dailyCompletions.get(i).getDate()).isEqualTo(today.minusDays(6 - i));
+                assertThat(dailyCompletions.get(i).getCompletedTasks()).isEqualTo((long) i);
+            }
+        }
+    }
 
-            verify(taskRepository, times(1)).countByAssignedTo_Login(currentUserLogin);
-            verify(taskRepository, times(TaskStatus.values().length)).countByStatusAndAssignedTo_Login(any(TaskStatus.class), eq(currentUserLogin));
-            verify(taskRepository, times(7)).countByStatusAndCreatedAtBetweenAndAssignedTo_Login(
-                eq(TaskStatus.DONE),
-                any(Instant.class),
-                any(Instant.class),
-                eq(currentUserLogin)
-            );
+    @Test
+    void getDashboardData_shouldHandleNoUserLogin() {
+        try (MockedStatic<SecurityUtils> mockedSecurityUtils = mockStatic(SecurityUtils.class)) {
+            mockedSecurityUtils.when(SecurityUtils::getCurrentUserLogin).thenReturn(Optional.empty());
+
+            org.assertj.core.api.Assertions.assertThatThrownBy(() -> dashboardService.getDashboardData())
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("Current user login not found");
         }
     }
 }
