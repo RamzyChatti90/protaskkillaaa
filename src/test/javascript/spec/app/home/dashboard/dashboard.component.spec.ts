@@ -1,87 +1,97 @@
-
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { of } from 'rxjs';
-import { DashboardComponent } from 'app/home/dashboard/dashboard.component';
-import { DashboardService } from 'app/home/dashboard/dashboard.service';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { DashboardData } from 'app/home/dashboard/dashboard.model';
+import { of, Subject } from 'rxjs';
+import { DashboardComponent } from './dashboard.component';
+import { DashboardService } from './dashboard.service';
+import { DashboardData } from './dashboard.model';
+import Chart from 'chart.js/auto';
 
 describe('DashboardComponent', () => {
   let component: DashboardComponent;
   let fixture: ComponentFixture<DashboardComponent>;
-  let dashboardService: DashboardService;
-  let translateService: TranslateService;
+  let mockDashboardService: Partial<DashboardService>;
 
   const mockDashboardData: DashboardData = {
-    totalTasks: 10,
-    completedTasks: 5,
-    inProgressTasks: 3,
-    dailyCompletions: [
-      { date: '2023-01-01', completedTasks: 1 },
-      { date: '2023-01-02', completedTasks: 2 },
+    totalTasks: 100,
+    completedTasks: 50,
+    inProgressTasks: 30,
+    tasksByStatus: [
+      { status: 'TODO', count: 20 },
+      { status: 'IN_PROGRESS', count: 30 },
+      { status: 'DONE', count: 50 },
+    ],
+    dailyTaskCompletion: [
+      { date: '2023-01-01', completedTasks: 5 },
+      { date: '2023-01-02', completedTasks: 8 },
+      { date: '2023-01-03', completedTasks: 12 },
+      { date: '2023-01-04', completedTasks: 10 },
+      { date: '2023-01-05', completedTasks: 7 },
+      { date: '2023-01-06', completedTasks: 15 },
+      { date: '2023-01-07', completedTasks: 20 },
     ],
   };
 
   beforeEach(async () => {
-    const dashboardServiceMock = {
-      getDashboardData: jest.fn(() => of(mockDashboardData)),
-    };
-
-    const translateServiceMock = {
-      instant: jest.fn(key => key), // Mock instant to return the key itself
+    mockDashboardService = {
+      getDashboardData: () => of(mockDashboardData),
     };
 
     await TestBed.configureTestingModule({
-      imports: [DashboardComponent, HttpClientTestingModule, TranslateModule.forRoot()],
-      providers: [
-        { provide: DashboardService, useValue: dashboardServiceMock },
-        { provide: TranslateService, useValue: translateServiceMock },
-      ],
+      imports: [HttpClientTestingModule, DashboardComponent],
+      providers: [{ provide: DashboardService, useValue: mockDashboardService }],
     }).compileComponents();
 
     fixture = TestBed.createComponent(DashboardComponent);
     component = fixture.componentInstance;
-    dashboardService = TestBed.inject(DashboardService);
-    translateService = TestBed.inject(TranslateService);
+
+    // Mock Chart.js to prevent actual chart rendering in tests
+    spyOn(Chart.prototype, 'destroy');
+    spyOn<any>(component, 'renderCharts').and.callThrough(); // Spy on renderCharts to ensure it's called
+
+    fixture.detectChanges(); // Calls ngOnInit
   });
 
-  it('should create the component', () => {
+  it('should create', () => {
     expect(component).toBeTruthy();
   });
 
   it('should load dashboard data on init', () => {
-    fixture.detectChanges(); // Calls ngOnInit
-    expect(dashboardService.getDashboardData).toHaveBeenCalled();
+    expect(component.isLoading()).toBe(false);
     expect(component.dashboardData()).toEqual(mockDashboardData);
+    expect(component.renderCharts).toHaveBeenCalled();
   });
 
-  it('should initialize charts with data', () => {
-    fixture.detectChanges(); // Calls ngOnInit and updateCharts
-    // Since Chart.js involves DOM manipulation, we'll check if the methods were called
-    // and if the chart objects are instantiated.
-    // We can't directly assert Chart.js rendering without a more complex setup (e.g., JSDOM or actual browser).
-    // For unit tests, checking the logic that *prepares* the charts is sufficient.
-    expect(component.dailyCompletionChart).not.toBeNull();
-    expect(component.taskStatusChart).not.toBeNull();
+  it('should render charts with correct data', () => {
+    // Ensure renderCharts is called and data is passed
+    const data = component.dashboardData();
+    expect(data).toEqual(mockDashboardData);
+
+    // Check if Chart constructor is called (indirectly via renderCharts)
+    // We cannot directly spy on the Chart constructor, but we can check if destroy is called on cleanup
+    // and ensure the renderCharts method was invoked.
+
+    // Simulate chart creation (we can't directly check the constructor args without more advanced mocking)
+    component.renderCharts();
+    expect(Chart.prototype.destroy).toHaveBeenCalledTimes(2); // Initial call + one in renderCharts
+    expect(component.dailyCompletionChart).toBeDefined();
+    expect(component.tasksByStatusChart).toBeDefined();
   });
 
-  it('should destroy charts on destroy', () => {
-    fixture.detectChanges(); // Create charts
-    const dailyCompletionChartDestroySpy = jest.spyOn(component.dailyCompletionChart!, 'destroy');
-    const taskStatusChartDestroySpy = jest.spyOn(component.taskStatusChart!, 'destroy');
-
+  it('should destroy charts on ngOnDestroy', () => {
     component.ngOnDestroy();
-
-    expect(dailyCompletionChartDestroySpy).toHaveBeenCalled();
-    expect(taskStatusChartDestroySpy).toHaveBeenCalled();
+    expect(Chart.prototype.destroy).toHaveBeenCalledTimes(4); // 2 from previous renderCharts, 2 from ngOnDestroy
   });
 
-  it('should translate chart labels', () => {
-    fixture.detectChanges(); // Calls ngOnInit and updateCharts
-    expect(translateService.instant).toHaveBeenCalledWith('home.dashboard.dailyCompletionChart.label');
-    expect(translateService.instant).toHaveBeenCalledWith('home.dashboard.taskStatusChart.completed');
-    expect(translateService.instant).toHaveBeenCalledWith('home.dashboard.taskStatusChart.inProgress');
-    expect(translateService.instant).toHaveBeenCalledWith('home.dashboard.taskStatusChart.todo');
+  it('should handle error when loading dashboard data', () => {
+    const errorSubject = new Subject<any>();
+    mockDashboardService.getDashboardData = () => errorSubject;
+
+    component.loadDashboardData(); // Call to trigger new subscription
+
+    errorSubject.error('Test Error');
+
+    expect(component.isLoading()).toBe(false);
+    expect(component.errorMessage()).toBe('Erreur lors du chargement des données du tableau de bord.');
+    expect(component.dashboardData()).toBeNull();
   });
 });
