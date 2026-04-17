@@ -33,26 +33,14 @@
       <div class="col-md-6">
         <div class="card">
           <div class="card-body chart-container">
-            <canvas baseChart
-                    [data]="lineChartData"
-                    [options]="lineChartOptions"
-                    [type]="lineChartType">
-            </canvas>
+            <canvas #lineChart></canvas>
           </div>
         </div>
       </div>
       <div class="col-md-6">
         <div class="card">
           <div class="card-body chart-container">
-            <canvas baseChart
-                    [data]="pieChartData"
-                    [options]="pieChartOptions"
-                    [type]="pieChartType">
-            </canvas>
-          </div>
-        </div>
-      </div>
-    </div>
+            <canvas #pieChart></canvas>
 
     <div *ngIf="isLoading" class="text-center mt-3">
       <fa-icon icon="sync" [spin]="true" size="2x"></fa-icon>
