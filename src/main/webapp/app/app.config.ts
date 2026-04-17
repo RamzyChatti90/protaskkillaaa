@@ -55,7 +55,8 @@ export const appConfig: ApplicationConfig = {
     { provide: NgbDateAdapter, useClass: NgbDateDayjsAdapter },
     // Ensure httpInterceptorProviders are declared before provideHttpClient(withInterceptorsFromDi())
     // to guarantee they are available for discovery by the HTTP client setup.
-    httpInterceptorProviders,
+    // The httpInterceptorProviders array needs to be spread to provide each interceptor individually.
+    ...httpInterceptorProviders,
     provideHttpClient(withInterceptorsFromDi()),
     { provide: TitleStrategy, useClass: AppPageTitleStrategy },
     // jhipster-needle-angular-add-module JHipster will add new module here
