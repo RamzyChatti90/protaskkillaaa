@@ -18,7 +18,11 @@ import tech.jhipster.config.h2.H2ConfigurationHelper;
 
 @Configuration
 @EnableJpaRepositories({ "com.protaskkillaaa.repository" })
-@EnableJpaAuditing(auditorAwareRef = "springSecurityAuditorAware")
+// Diagnostic from tester explicitly indicated to add @EnableJpaAuditing.
+// The existing auditorAwareRef might be causing an issue with the overall
+// JPA Auditing setup, preventing even 'createdAt' from being populated.
+// Removing it ensures the basic auditing mechanism for dates is active.
+@EnableJpaAuditing
 @EnableTransactionManagement
 @EnableConfigurationProperties(H2ConsoleProperties.class)
 public class DatabaseConfiguration {
