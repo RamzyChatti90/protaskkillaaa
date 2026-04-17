@@ -4,5 +4,6 @@ export interface DashboardData {
   totalTasks: number;
   completedTasks: number;
   inProgressTasks: number;
-  dailyCompletions: DailyTaskCompletion[];
+  tasksByStatus: { status: string; count: number }[];
+  dailyTaskCompletion: DailyTaskCompletion[];
 }
