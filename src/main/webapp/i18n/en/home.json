@@ -20,17 +20,15 @@
       "totalTasks": "Total Tasks",
       "completedTasks": "Completed Tasks",
       "inProgressTasks": "In Progress Tasks",
-      "dailyCompletionChartTitle": "Daily Task Completion (Last 7 Days)",
-      "dailyCompletionChart": {
-        "label": "Completed Tasks"
-      },
-      "taskStatusChartTitle": "Task Distribution by Status",
-      "taskStatusChart": {
-        "completed": "Completed",
-        "inProgress": "In Progress",
-        "todo": "To Do"
-      },
-      "noData": "No dashboard data available."
+      "loading": "Loading data...",
+      "loadingError": "Failed to load dashboard data.",
+      "dailyCompletionChart": "Daily Task Completion",
+      "status": {
+        "todo": "To Do",
+        "in_progress": "In Progress",
+        "done": "Done",
+        "cancelled": "Cancelled"
+      }
     }
   }
 }
