@@ -4,7 +4,8 @@ import { takeUntil } from 'rxjs/operators';
 import { Chart, ChartConfiguration, ChartData, ChartOptions, ChartType, registerables } from 'chart.js';
 
 import { CommonModule } from '@angular/common';
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { FaIconLibrary, FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { faSync } from '@fortawesome/free-solid-svg-icons';
 import { DashboardService } from './dashboard.service';
 import { IDashboardStats } from './dashboard.model';
 
@@ -91,16 +92,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
       legend: {
         position: 'top',
       },
-        position: 'top',
-      },
     },
   };
   public pieChartType: ChartType = 'pie';
 
   protected destroy$ = new Subject<void>();
-
-  constructor(protected dashboardService: DashboardService) {
+  constructor(protected dashboardService: DashboardService, private faLibrary: FaIconLibrary) {
     Chart.register(...registerables);
+    this.faLibrary.addIcons(faSync);
   }
   ngOnInit(): void {
     this.loadDashboardData();
@@ -118,6 +117,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
       data: this.pieChartData,
       options: this.pieChartOptions,
     });
+  }
+
   loadDashboardData(): void {
     this.isLoading = true;
     combineLatest([
@@ -165,3 +166,4 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.lineChart?.destroy();
     this.pieChart?.destroy();
   }
+}
