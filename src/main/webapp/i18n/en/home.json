@@ -29,7 +29,8 @@
         "completed": "Completed",
         "inProgress": "In Progress",
         "todo": "To Do"
-      }
+      },
+      "noData": "No dashboard data available."
     }
   }
 }
