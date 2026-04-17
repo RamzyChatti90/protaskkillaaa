@@ -3,7 +3,7 @@ import { Chart, registerables } from 'chart.js';
 import { DashboardService } from './dashboard.service';
 import { DashboardData } from './dashboard.model';
 import { CommonModule, NgIf } from '@angular/common';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 Chart.register(...registerables);
 
@@ -22,8 +22,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   dailyCompletionChart: Chart | null = null;
   taskStatusChart: Chart | null = null;
 
-  constructor(private dashboardService: DashboardService) {}
-
+  constructor(private dashboardService: DashboardService, private translateService: TranslateService) {}
   ngOnInit(): void {
     this.dashboardService.getDashboardData().subscribe(data => {
       this.dashboardData.set(data);
@@ -64,7 +63,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
             labels: labels,
             datasets: [
               {
-                label: 'Tâches terminées',
+                label: this.translateService.instant('home.dashboard.dailyCompletionChart.label'),
                 data: data,
                 borderColor: 'rgb(75, 192, 192)',
                 tension: 0.1,
@@ -96,9 +95,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
         const data = [
           this.dashboardData()!.completedTasks,
           this.dashboardData()!.inProgressTasks,
-          this.dashboardData()!.totalTasks - this.dashboardData()!.completedTasks - this.dashboardData()!.inProgressTasks, // TODO (a faire)
+          this.dashboardData()!.totalTasks - this.dashboardData()!.completedTasks - this.dashboardData()!.inProgressTasks,
         ];
-        const labels = ['Terminées', 'En cours', 'À faire'];
+        const labels = [
+          this.translateService.instant('home.dashboard.taskStatusChart.completed'),
+          this.translateService.instant('home.dashboard.taskStatusChart.inProgress'),
+          this.translateService.instant('home.dashboard.taskStatusChart.todo'),
+        ];
 
         if (this.taskStatusChart) {
           this.taskStatusChart.destroy();
@@ -111,7 +114,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
             datasets: [
               {
                 data: data,
-                backgroundColor: ['rgb(75, 192, 192)', 'rgb(255, 205, 86)', 'rgb(255, 99, 132)'],
                 hoverOffset: 4,
               },
             ],
