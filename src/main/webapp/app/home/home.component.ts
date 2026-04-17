@@ -4,7 +4,7 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 import SharedModule from 'app/shared/shared.module';
-import DashboardComponent from './dashboard/dashboard.component';
+import { DashboardComponent } from './dashboard/dashboard.component'; // Correction ici: import nommé
 import { AccountService } from 'app/core/auth/account.service';
 import { Account } from 'app/core/auth/account.model';
 
