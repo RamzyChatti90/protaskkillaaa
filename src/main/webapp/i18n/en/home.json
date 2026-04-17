@@ -22,7 +22,6 @@
       "completedTasks": "Completed Tasks",
       "inProgressTasks": "In Progress Tasks",
       "dailyCompletionChart": "Daily Task Completion",
-      "taskStatusChart": "Task Status Distribution"
+      "taskStatusChart": "Task Distribution by Status"
     }
-  }
 }
