@@ -10,9 +10,4 @@ import { DashboardComponent } from './dashboard/dashboard.component';
   imports: [SharedModule, RouterModule.forChild([HOME_ROUTE]), DashboardComponent],
   declarations: [HomeComponent],
 })
-
-@NgModule({
-  imports: [SharedModule, RouterModule.forChild([HOME_ROUTE])],
-  declarations: [HomeComponent],
-})
 export class ProtaskkillaaaHomeModule {}
