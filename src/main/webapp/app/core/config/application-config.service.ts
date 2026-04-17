@@ -4,8 +4,15 @@ import { Injectable } from '@angular/core';
   providedIn: 'root',
 })
 export class ApplicationConfigService {
-  private endpointPrefix = '';
+  private endpointPrefix: string;
   private microfrontend = false;
+
+  constructor() {
+    this.endpointPrefix = (window as any).__CARNIVAL_API__ || '';
+    if (this.endpointPrefix && !this.endpointPrefix.endsWith('/')) {
+      this.endpointPrefix += '/';
+    }
+  }
 
   setEndpointPrefix(endpointPrefix: string): void {
     this.endpointPrefix = endpointPrefix;
