@@ -16,7 +16,7 @@ import { IDashboardStats } from './dashboard.model';
   standalone: true,
   imports: [CommonModule, FontAwesomeModule],
 })
-export class DashboardComponent implements OnInit, OnDestroy {
+export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
   dashboardStats: IDashboardStats | null = null;
   isLoading = false;
 
